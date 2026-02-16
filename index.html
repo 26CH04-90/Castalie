@@ -186,8 +186,10 @@
     button.secondary { background: rgba(255,255,255,0.06); }
     button:active { transform: translateY(1px); }
 
-    .settings-toggle {
+    .settings-wrap {
       margin-top: 12px;
+    }
+    .settings-toggle {
       width: 100%;
       background: rgba(255,255,255,0.08);
     }
@@ -242,7 +244,6 @@
       </div>
 
       <div class="btns">
-        <button id="calcBtn">Calculer</button>
         <button id="copyBtn" class="secondary">Copier résultats</button>
       </div>
 
@@ -262,73 +263,7 @@
       </div>
 
       <div class="hint">
-        Les listes ci-dessous sont les distances cumulées depuis la lambourde gauche (comme ta feuille).
-        Stop d’affichage si (position + largeur arrière) &gt; distance extérieure.
-      </div>
-
-      <button id="settingsBtn" class="settings-toggle secondary" type="button">Réglages de base</button>
-
-      <div id="settingsPanel" class="settings-panel card">
-        <h2 class="settings-title">Réglages de base</h2>
-
-        <div class="row">
-          <div>
-            <label>Pas nominal (mm) – base du comptage</label>
-            <input id="pasNom" type="number" value="185" min="1" step="0.1" inputmode="decimal" />
-          </div>
-          <div class="toggle">
-            <div>
-              <div style="font-weight:600;">Arrondi sup (au lieu du ROUND Excel)</div>
-              <small>Par défaut: arrondi au plus proche, comme ta feuille (ROUND).</small>
-            </div>
-            <input id="roundUp" type="checkbox" />
-          </div>
-        </div>
-
-        <div class="row3" style="margin-top:10px;">
-          <div>
-            <label>Épaisseur embrasure (mm)</label>
-            <input id="epEmbr" type="number" value="20" step="0.1" />
-          </div>
-          <div>
-            <label>Largeur lame avant (mm)</label>
-            <input id="larAv" type="number" value="130" step="0.1" />
-          </div>
-          <div>
-            <label>Largeur lame arrière (mm)</label>
-            <input id="larAr" type="number" value="92" step="0.1" />
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div>
-            <label>Épaisseur lame avant (mm)</label>
-            <input id="epAv" type="number" value="25" step="0.1" />
-          </div>
-          <div>
-            <label>Épaisseur lame arrière (mm)</label>
-            <input id="epAr" type="number" value="20" step="0.1" />
-          </div>
-        </div>
-
-        <div class="kpis" style="margin-top:10px;">
-          <div class="kpi">
-            <div class="t">Offset gauche (mm)</div>
-            <div class="v" id="outOG">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Offset droite (mm)</div>
-            <div class="v" id="outOD">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Nombre d’entraxes (N)</div>
-            <div class="v" id="outN">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Nb V total (entre L)</div>
-            <div class="v" id="outNbV">—</div>
-          </div>
-        </div>
+        Les listes ci-dessous sont les distances cumulées depuis la lambourde gauche
       </div>
     </section>
 
@@ -379,6 +314,73 @@
 
     </section>
   </div>
+
+  <section class="settings-wrap">
+    <button id="settingsBtn" class="settings-toggle secondary" type="button">Réglage de base</button>
+
+    <div id="settingsPanel" class="settings-panel card">
+      <h2 class="settings-title">Réglages de base</h2>
+
+      <div class="row">
+        <div>
+          <label>Pas nominal (mm) – base du comptage</label>
+          <input id="pasNom" type="number" value="185" min="1" step="0.1" inputmode="decimal" />
+        </div>
+        <div class="toggle">
+          <div>
+            <div style="font-weight:600;">Arrondi sup (au lieu du ROUND Excel)</div>
+            <small>Par défaut: arrondi au plus proche, comme ta feuille (ROUND).</small>
+          </div>
+          <input id="roundUp" type="checkbox" />
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:10px;">
+        <div>
+          <label>Épaisseur embrasure (mm)</label>
+          <input id="epEmbr" type="number" value="20" step="0.1" />
+        </div>
+        <div>
+          <label>Largeur lame avant (mm)</label>
+          <input id="larAv" type="number" value="130" step="0.1" />
+        </div>
+        <div>
+          <label>Largeur lame arrière (mm)</label>
+          <input id="larAr" type="number" value="92" step="0.1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Épaisseur lame avant (mm)</label>
+          <input id="epAv" type="number" value="25" step="0.1" />
+        </div>
+        <div>
+          <label>Épaisseur lame arrière (mm)</label>
+          <input id="epAr" type="number" value="20" step="0.1" />
+        </div>
+      </div>
+
+      <div class="kpis" style="margin-top:10px;">
+        <div class="kpi">
+          <div class="t">Offset gauche (mm)</div>
+          <div class="v" id="outOG">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Offset droite (mm)</div>
+          <div class="v" id="outOD">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Nombre d’entraxes (N)</div>
+          <div class="v" id="outN">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Nb V total (entre L)</div>
+          <div class="v" id="outNbV">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -431,6 +433,13 @@
   function fmt(n, d=1) {
     if (!Number.isFinite(n)) return "—";
     return n.toFixed(d).replace(".", ",");
+  }
+
+  function selectedJonctionLabel(id) {
+    const select = $(id);
+    const selected = select.options[select.selectedIndex];
+    const [, label = selected.textContent.trim()] = selected.textContent.split("—");
+    return label.trim();
   }
 
   function buildPositions(distExt, larAr, l1Start, e) {
@@ -654,7 +663,6 @@
     };
   }
 
-  $("calcBtn").addEventListener("click", compute);
   $("settingsBtn").addEventListener("click", () => {
     const panel = $("settingsPanel");
     panel.classList.toggle("open");
@@ -667,12 +675,8 @@
     const txt =
 `BARDAGE – RÉSULTATS
 Distance ext: ${data.distExt} mm
-Jonction gauche: ${data.jG} | droite: ${data.jD}
-Offset gauche: ${data.oG.toFixed(1)} mm | offset droite: ${data.oD.toFixed(1)} mm
+Jonction gauche: ${selectedJonctionLabel("jG")} | droite: ${selectedJonctionLabel("jD")}
 D1: ${data.D1.toFixed(1)} mm
-N: ${data.N}
-Entraxe e: ${data.e.toFixed(1)} mm
-L1 start: ${data.L1Start.toFixed(1)} mm
 Nb L1: ${data.L1.length} | Nb L2: ${data.L2.length}
 V total: ${data.V.total} (V1/V2/V3: ${data.V.v1}/${data.V.v2}/${data.V.v3})
 

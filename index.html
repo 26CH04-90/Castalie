@@ -185,13 +185,29 @@
     }
     button.secondary { background: rgba(255,255,255,0.06); }
     button:active { transform: translateY(1px); }
+
+    .settings-toggle {
+      margin-top: 12px;
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+    }
+    .settings-panel {
+      margin-top: 10px;
+      display: none;
+    }
+    .settings-panel.open { display: block; }
+    .settings-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
   </style>
 </head>
 
 <body>
 <header>
-  <h1>Bardage – calcul entraxes (L1/L2 + V centrées)</h1>
-  <p>Entrer la distance extérieure lambourdes, jonction gauche/droite. Résultats: D1, entraxe, listes L1/L2 + visu.</p>
+  <h1>La Castalie bâtiment 3 - Calcul de position des lames L1, L2</h1>
+  <p>Entrer la distance extérieure lambourdes, et le type gauche/droite.</p>
 </header>
 
 <main>
@@ -201,10 +217,6 @@
         <div>
           <label>Distance extérieure lambourdes (mm)</label>
           <input id="distExt" type="number" value="2320" min="0" step="1" inputmode="numeric" />
-        </div>
-        <div>
-          <label>Pas nominal (mm) – base du comptage</label>
-          <input id="pasNom" type="number" value="185" min="1" step="0.1" inputmode="decimal" />
         </div>
       </div>
 
@@ -229,39 +241,6 @@
         </div>
       </div>
 
-      <div class="row3" style="margin-top:10px;">
-        <div>
-          <label>Épaisseur embrasure (mm)</label>
-          <input id="epEmbr" type="number" value="20" step="0.1" />
-        </div>
-        <div>
-          <label>Largeur lame avant (mm)</label>
-          <input id="larAv" type="number" value="130" step="0.1" />
-        </div>
-        <div>
-          <label>Largeur lame arrière (mm)</label>
-          <input id="larAr" type="number" value="92" step="0.1" />
-        </div>
-      </div>
-
-      <div class="row3" style="margin-top:10px;">
-        <div>
-          <label>Épaisseur lame avant (mm)</label>
-          <input id="epAv" type="number" value="25" step="0.1" />
-        </div>
-        <div>
-          <label>Épaisseur lame arrière (mm)</label>
-          <input id="epAr" type="number" value="20" step="0.1" />
-        </div>
-        <div class="toggle">
-          <div>
-            <div style="font-weight:600;">Arrondi sup (au lieu du ROUND Excel)</div>
-            <small>Par défaut: arrondi au plus proche, comme ta feuille (ROUND).</small>
-          </div>
-          <input id="roundUp" type="checkbox" />
-        </div>
-      </div>
-
       <div class="btns">
         <button id="calcBtn">Calculer</button>
         <button id="copyBtn" class="secondary">Copier résultats</button>
@@ -269,20 +248,8 @@
 
       <div class="kpis">
         <div class="kpi">
-          <div class="t">Offset gauche (mm)</div>
-          <div class="v" id="outOG">—</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Offset droite (mm)</div>
-          <div class="v" id="outOD">—</div>
-        </div>
-        <div class="kpi">
           <div class="t">D1 (première à dernière lame) (mm)</div>
           <div class="v" id="outD1">—</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Nombre d’entraxes (N)</div>
-          <div class="v" id="outN">—</div>
         </div>
         <div class="kpi">
           <div class="t">Entraxe réel (e) (mm)</div>
@@ -297,6 +264,71 @@
       <div class="hint">
         Les listes ci-dessous sont les distances cumulées depuis la lambourde gauche (comme ta feuille).
         Stop d’affichage si (position + largeur arrière) &gt; distance extérieure.
+      </div>
+
+      <button id="settingsBtn" class="settings-toggle secondary" type="button">Réglages de base</button>
+
+      <div id="settingsPanel" class="settings-panel card">
+        <h2 class="settings-title">Réglages de base</h2>
+
+        <div class="row">
+          <div>
+            <label>Pas nominal (mm) – base du comptage</label>
+            <input id="pasNom" type="number" value="185" min="1" step="0.1" inputmode="decimal" />
+          </div>
+          <div class="toggle">
+            <div>
+              <div style="font-weight:600;">Arrondi sup (au lieu du ROUND Excel)</div>
+              <small>Par défaut: arrondi au plus proche, comme ta feuille (ROUND).</small>
+            </div>
+            <input id="roundUp" type="checkbox" />
+          </div>
+        </div>
+
+        <div class="row3" style="margin-top:10px;">
+          <div>
+            <label>Épaisseur embrasure (mm)</label>
+            <input id="epEmbr" type="number" value="20" step="0.1" />
+          </div>
+          <div>
+            <label>Largeur lame avant (mm)</label>
+            <input id="larAv" type="number" value="130" step="0.1" />
+          </div>
+          <div>
+            <label>Largeur lame arrière (mm)</label>
+            <input id="larAr" type="number" value="92" step="0.1" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <div>
+            <label>Épaisseur lame avant (mm)</label>
+            <input id="epAv" type="number" value="25" step="0.1" />
+          </div>
+          <div>
+            <label>Épaisseur lame arrière (mm)</label>
+            <input id="epAr" type="number" value="20" step="0.1" />
+          </div>
+        </div>
+
+        <div class="kpis" style="margin-top:10px;">
+          <div class="kpi">
+            <div class="t">Offset gauche (mm)</div>
+            <div class="v" id="outOG">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Offset droite (mm)</div>
+            <div class="v" id="outOD">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Nombre d’entraxes (N)</div>
+            <div class="v" id="outN">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Nb V total (entre L)</div>
+            <div class="v" id="outNbV">—</div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -324,10 +356,6 @@
         <div class="kpi">
           <div class="t">Nb L2</div>
           <div class="v" id="outNbL2">—</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Nb V total (entre L)</div>
-          <div class="v" id="outNbV">—</div>
         </div>
         <div class="kpi">
           <div class="t">V1 / V2 / V3</div>
@@ -627,6 +655,10 @@
   }
 
   $("calcBtn").addEventListener("click", compute);
+  $("settingsBtn").addEventListener("click", () => {
+    const panel = $("settingsPanel");
+    panel.classList.toggle("open");
+  });
   ["distExt","pasNom","jG","jD","epEmbr","larAv","larAr","epAv","epAr","roundUp"]
     .forEach(id => $(id).addEventListener("input", compute));
 

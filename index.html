@@ -226,19 +226,19 @@
         <div>
           <label>Jonction gauche</label>
           <select id="jG">
-            <option value="1">1 — Embrasure</option>
-            <option value="2">2 — Angle sortant</option>
-            <option value="3" selected>3 — Angle rentrant</option>
-            <option value="4">4 — Menuiserie</option>
+            <option value="1">Embrasure</option>
+            <option value="2">Angle sortant</option>
+            <option value="3" selected>Angle rentrant</option>
+            <option value="4">Menuiserie</option>
           </select>
         </div>
         <div>
           <label>Jonction droite</label>
           <select id="jD">
-            <option value="1">1 — Embrasure</option>
-            <option value="2">2 — Angle sortant</option>
-            <option value="3">3 — Angle rentrant</option>
-            <option value="4" selected>4 — Menuiserie</option>
+            <option value="1">Embrasure</option>
+            <option value="2">Angle sortant</option>
+            <option value="3">Angle rentrant</option>
+            <option value="4" selected>Menuiserie</option>
           </select>
         </div>
       </div>
@@ -438,8 +438,7 @@
   function selectedJonctionLabel(id) {
     const select = $(id);
     const selected = select.options[select.selectedIndex];
-    const [, label = selected.textContent.trim()] = selected.textContent.split("—");
-    return label.trim();
+    return selected.textContent.trim();
   }
 
   function buildPositions(distExt, larAr, l1Start, e) {

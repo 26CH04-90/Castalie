@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bardage – Entraxes / L1-L2</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+      --good: #57d18b;
+      --warn: #ffcc66;
+
+      /* Couleurs lames (à adapter) */
+      --l1: #6fdc5e;
+      --l2: #66a8ff;
+      --v1: #4b4b4b;
+      --v2: #6c6c6c;
+      --v3: #8a8a8a;
+      --wood: #2b2f3a;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(80,120,255,0.20), transparent 55%),
+                  radial-gradient(900px 600px at 80% 20%, rgba(80,255,180,0.12), transparent 50%),
+                  var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      padding: 14px 16px 6px;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(11,16,32,0.7);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.2px;
+    }
+    header p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    main { padding: 12px 16px 22px; max-width: 980px; margin: 0 auto; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 920px) {
+      .grid { grid-template-columns: 1.05fr 0.95fr; align-items: start; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: rgba(140,180,255,0.6); }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+    }
+    .toggle small { color: var(--muted); }
+    .toggle input { width: auto; transform: scale(1.3); }
+
+    .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .kpi {
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .kpi .t { font-size: 12px; color: var(--muted); }
+    .kpi .v { font-size: 18px; margin-top: 4px; }
+
+    .hint { margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.3; }
+
+    .tables { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 520px) { .tables { grid-template-columns: 1fr 1fr; } }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.16);
+    }
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 14px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.05);
+      letter-spacing: 0.2px;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    .viz {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.16);
+      padding: 10px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .chip { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+    .dot.l1 { background: var(--l1); }
+    .dot.l2 { background: var(--l2); }
+    .dot.v1 { background: var(--v1); }
+    .dot.v2 { background: var(--v2); }
+    .dot.v3 { background: var(--v3); }
+
+    svg { width: 100%; height: 120px; display: block; }
+    .footer {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .btns { display:flex; gap:10px; margin-top:10px; }
+    button {
+      flex: 1;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(80,120,255,0.22);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.secondary { background: rgba(255,255,255,0.06); }
+    button:active { transform: translateY(1px); }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>Bardage – calcul entraxes (L1/L2 + V centrées)</h1>
+  <p>Entrer la distance extérieure lambourdes, jonction gauche/droite. Résultats: D1, entraxe, listes L1/L2 + visu.</p>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <div class="row">
+        <div>
+          <label>Distance extérieure lambourdes (mm)</label>
+          <input id="distExt" type="number" value="2320" min="0" step="1" inputmode="numeric" />
+        </div>
+        <div>
+          <label>Pas nominal (mm) – base du comptage</label>
+          <input id="pasNom" type="number" value="185" min="1" step="0.1" inputmode="decimal" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Jonction gauche</label>
+          <select id="jG">
+            <option value="1">1 — Embrasure</option>
+            <option value="2">2 — Angle sortant</option>
+            <option value="3" selected>3 — Angle rentrant</option>
+            <option value="4">4 — Menuiserie</option>
+          </select>
+        </div>
+        <div>
+          <label>Jonction droite</label>
+          <select id="jD">
+            <option value="1">1 — Embrasure</option>
+            <option value="2">2 — Angle sortant</option>
+            <option value="3">3 — Angle rentrant</option>
+            <option value="4" selected>4 — Menuiserie</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:10px;">
+        <div>
+          <label>Épaisseur embrasure (mm)</label>
+          <input id="epEmbr" type="number" value="20" step="0.1" />
+        </div>
+        <div>
+          <label>Largeur lame avant (mm)</label>
+          <input id="larAv" type="number" value="130" step="0.1" />
+        </div>
+        <div>
+          <label>Largeur lame arrière (mm)</label>
+          <input id="larAr" type="number" value="92" step="0.1" />
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:10px;">
+        <div>
+          <label>Épaisseur lame avant (mm)</label>
+          <input id="epAv" type="number" value="25" step="0.1" />
+        </div>
+        <div>
+          <label>Épaisseur lame arrière (mm)</label>
+          <input id="epAr" type="number" value="20" step="0.1" />
+        </div>
+        <div class="toggle">
+          <div>
+            <div style="font-weight:600;">Arrondi sup (au lieu du ROUND Excel)</div>
+            <small>Par défaut: arrondi au plus proche, comme ta feuille (ROUND).</small>
+          </div>
+          <input id="roundUp" type="checkbox" />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="calcBtn">Calculer</button>
+        <button id="copyBtn" class="secondary">Copier résultats</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">Offset gauche (mm)</div>
+          <div class="v" id="outOG">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Offset droite (mm)</div>
+          <div class="v" id="outOD">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">D1 (première à dernière lame) (mm)</div>
+          <div class="v" id="outD1">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Nombre d’entraxes (N)</div>
+          <div class="v" id="outN">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Entraxe réel (e) (mm)</div>
+          <div class="v" id="outE">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Distance L1 depuis extérieur lambourde (mm)</div>
+          <div class="v" id="outL1Start">—</div>
+        </div>
+      </div>
+
+      <div class="hint">
+        Les listes ci-dessous sont les distances cumulées depuis la lambourde gauche (comme ta feuille).
+        Stop d’affichage si (position + largeur arrière) &gt; distance extérieure.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tables">
+        <div>
+          <table>
+            <thead><tr><th>L1 – distances cumulées (mm)</th><th>#</th></tr></thead>
+            <tbody id="tabL1"></tbody>
+          </table>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>L2 – distances cumulées (mm)</th><th>#</th></tr></thead>
+            <tbody id="tabL2"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="kpis" style="margin-top:10px;">
+        <div class="kpi">
+          <div class="t">Nb L1</div>
+          <div class="v" id="outNbL1">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Nb L2</div>
+          <div class="v" id="outNbL2">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Nb V total (entre L)</div>
+          <div class="v" id="outNbV">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">V1 / V2 / V3</div>
+          <div class="v" id="outV123">—</div>
+        </div>
+      </div>
+
+      <div class="viz">
+        <div class="legend">
+          <span class="chip"><span class="dot l1"></span>L1</span>
+          <span class="chip"><span class="dot l2"></span>L2</span>
+          <span class="chip"><span class="dot v1"></span>V1</span>
+          <span class="chip"><span class="dot v2"></span>V2</span>
+          <span class="chip"><span class="dot v3"></span>V3</span>
+        </div>
+        <svg id="svg"></svg>
+        <div class="footer">
+          Visu = vue de dessus simplifiée (lambourdes aux extrémités, L posées selon L1/L2, V centrées entre 2 L).
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<script>
+(function() {
+  const $ = (id) => document.getElementById(id);
+
+  function num(id) {
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  // Offsets identiques à ton Excel (Feuil1):
+  // Gauche:
+  // 1 embrasure: +epEmbr
+  // 2 angle sortant: +epAv+epAr
+  // 3 angle rentrant: -epAr
+  // 4 menuiserie: 0
+  function offsetG(type, epEmbr, epAv, epAr) {
+    switch(type) {
+      case 1: return +epEmbr;
+      case 2: return +(epAv + epAr);
+      case 3: return -epAr;
+      case 4: return 0;
+      default: return 0;
+    }
+  }
+
+  // Droite:
+  // 1 embrasure: +epEmbr - largeurAvant
+  // 2 angle sortant: +epAr - largeurAvant
+  // 3 angle rentrant: -epAv - epAr - largeurAvant
+  // 4 menuiserie: -largeurAvant
+  function offsetD(type, epEmbr, epAv, epAr, larAv) {
+    switch(type) {
+      case 1: return +(epEmbr - larAv);
+      case 2: return +(epAr - larAv);
+      case 3: return -(epAv + epAr + larAv);
+      case 4: return -larAv;
+      default: return -larAv;
+    }
+  }
+
+  function roundLikeExcel(x, useRoundUp) {
+    if (useRoundUp) return Math.ceil(x);
+    // Excel ROUND(x,0) = arrondi au plus proche, .5 loin de 0
+    // Math.round() fait .5 vers +inf, donc on corrige pour négatifs (ici x > 0 de toute façon)
+    return Math.round(x);
+  }
+
+  function fmt(n, d=1) {
+    if (!Number.isFinite(n)) return "—";
+    return n.toFixed(d).replace(".", ",");
+  }
+
+  function buildPositions(distExt, larAr, l1Start, e) {
+    // Reproduction des colonnes de ta feuille:
+    // L1: start puis +2e, +1e, +2e, +3e (cycle)
+    // L2: start = L1+e puis +3e, +2e, +1e, +2e (cycle)
+    const L1 = [];
+    const L2 = [];
+
+    function canPlace(pos) {
+      // condition Excel: (pos + larAr) > distExt => "-"
+      return (pos + larAr) <= distExt + 1e-9;
+    }
+
+    if (canPlace(l1Start)) L1.push(l1Start);
+    const incL1 = [2,1,2,3].map(k => k*e);
+
+    let i = 0;
+    while (L1.length < 300) { // garde-fou
+      const last = L1[L1.length-1];
+      const next = last + incL1[i % incL1.length];
+      if (!canPlace(next)) break;
+      L1.push(next);
+      i++;
+    }
+
+    const l2Start = l1Start + e;
+    if (canPlace(l2Start)) L2.push(l2Start);
+    const incL2 = [3,2,1,2].map(k => k*e);
+
+    i = 0;
+    while (L2.length < 300) {
+      const last = L2[L2.length-1];
+      const next = last + incL2[i % incL2.length];
+      if (!canPlace(next)) break;
+      L2.push(next);
+      i++;
+    }
+
+    return { L1, L2 };
+  }
+
+  function vBetweenL(L1, L2) {
+    // On reconstitue une liste L "triée" (toutes lames L), puis on met V au milieu de chaque intervalle.
+    const allL = [...L1.map(x => ({x, t:"L1"})), ...L2.map(x => ({x, t:"L2"}))].sort((a,b)=>a.x-b.x);
+    const V = [];
+    for (let i=0; i<allL.length-1; i++) {
+      const mid = (allL[i].x + allL[i+1].x)/2;
+      const typeIdx = i % 3; // V1,V2,V3,...
+      const vt = (typeIdx===0) ? "V1" : (typeIdx===1) ? "V2" : "V3";
+      V.push({ x: mid, t: vt });
+    }
+    return { allL, V };
+  }
+
+  function countVTypes(V) {
+    let v1=0,v2=0,v3=0;
+    for (const v of V) {
+      if (v.t==="V1") v1++;
+      if (v.t==="V2") v2++;
+      if (v.t==="V3") v3++;
+    }
+    return {v1,v2,v3};
+  }
+
+  function renderTable(tbodyId, arr) {
+    const tb = $(tbodyId);
+    tb.innerHTML = "";
+    if (!arr.length) {
+      tb.innerHTML = `<tr><td style="text-align:left;color:rgba(255,255,255,0.55);">—</td><td>—</td></tr>`;
+      return;
+    }
+    arr.forEach((v, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${fmt(v,0)}</td><td>${idx+1}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderSVG(distExt, larAr, allL, V) {
+    const svg = $("svg");
+    const w = svg.clientWidth || 600;
+    const h = 120;
+    const pad = 14;
+    const usable = w - 2*pad;
+
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    svg.innerHTML = "";
+
+    // fond
+    const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    bg.setAttribute("x", 0); bg.setAttribute("y", 0);
+    bg.setAttribute("width", w); bg.setAttribute("height", h);
+    bg.setAttribute("rx", 12);
+    bg.setAttribute("fill", "rgba(0,0,0,0.0)");
+    svg.appendChild(bg);
+
+    function xpx(mm) {
+      if (distExt <= 0) return pad;
+      return pad + (mm/distExt) * usable;
+    }
+
+    // lambourdes (extrémités)
+    const leftPost = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    leftPost.setAttribute("x", pad-4); leftPost.setAttribute("y", 18);
+    leftPost.setAttribute("width", 6); leftPost.setAttribute("height", 84);
+    leftPost.setAttribute("fill", "rgba(255,255,255,0.22)");
+    svg.appendChild(leftPost);
+
+    const rightPost = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rightPost.setAttribute("x", pad+usable-2); rightPost.setAttribute("y", 18);
+    rightPost.setAttribute("width", 6); rightPost.setAttribute("height", 84);
+    rightPost.setAttribute("fill", "rgba(255,255,255,0.22)");
+    svg.appendChild(rightPost);
+
+    // rail
+    const rail = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rail.setAttribute("x", pad); rail.setAttribute("y", 56);
+    rail.setAttribute("width", usable); rail.setAttribute("height", 8);
+    rail.setAttribute("fill", "rgba(255,255,255,0.08)");
+    rail.setAttribute("rx", 4);
+    svg.appendChild(rail);
+
+    // L lames (dessin simplifié: petits rectangles)
+    for (const l of allL) {
+      const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      r.setAttribute("x", xpx(l.x) - 9);
+      r.setAttribute("y", 36);
+      r.setAttribute("width", 18);
+      r.setAttribute("height", 44);
+      r.setAttribute("rx", 4);
+      r.setAttribute("fill", l.t==="L1" ? getComputedStyle(document.documentElement).getPropertyValue("--l1") : getComputedStyle(document.documentElement).getPropertyValue("--l2"));
+      r.setAttribute("opacity", "0.95");
+      svg.appendChild(r);
+    }
+
+    // V lames centrées entre L
+    for (const v of V) {
+      const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      r.setAttribute("x", xpx(v.x) - 6);
+      r.setAttribute("y", 22);
+      r.setAttribute("width", 12);
+      r.setAttribute("height", 76);
+      r.setAttribute("rx", 3);
+
+      const cssVar = (v.t==="V1") ? "--v1" : (v.t==="V2") ? "--v2" : "--v3";
+      r.setAttribute("fill", getComputedStyle(document.documentElement).getPropertyValue(cssVar));
+      r.setAttribute("opacity", "0.85");
+      svg.appendChild(r);
+    }
+
+    // cote
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1", pad); line.setAttribute("x2", pad+usable);
+    line.setAttribute("y1", 105); line.setAttribute("y2", 105);
+    line.setAttribute("stroke", "rgba(255,255,255,0.20)");
+    line.setAttribute("stroke-width", "2");
+    svg.appendChild(line);
+
+    const txt = document.createElementNS("http://www.w3.org/2000/svg","text");
+    txt.setAttribute("x", pad);
+    txt.setAttribute("y", 114);
+    txt.setAttribute("fill", "rgba(255,255,255,0.65)");
+    txt.setAttribute("font-size", "12");
+    txt.textContent = `Distance ext.: ${Math.round(distExt)} mm`;
+    svg.appendChild(txt);
+  }
+
+  function compute() {
+    const distExt = num("distExt");
+    const pasNom = num("pasNom");
+
+    const jG = parseInt($("jG").value, 10);
+    const jD = parseInt($("jD").value, 10);
+
+    const epEmbr = num("epEmbr");
+    const larAv = num("larAv");
+    const larAr = num("larAr");
+    const epAv = num("epAv");
+    const epAr = num("epAr");
+
+    const useRoundUp = $("roundUp").checked;
+
+    const oG = offsetG(jG, epEmbr, epAv, epAr);
+    const oD = offsetD(jD, epEmbr, epAv, epAr, larAv);
+
+    const D1 = distExt + oG + oD;
+    const N = Math.max(1, roundLikeExcel(D1 / pasNom, useRoundUp));
+    const e = D1 / N;
+
+    // Excel: L1Start = ((e + largeurAv)/2) - offsetG - (largeurAr/2)
+    const L1Start = ((e + larAv) / 2) - oG - (larAr / 2);
+
+    const { L1, L2 } = buildPositions(distExt, larAr, L1Start, e);
+    renderTable("tabL1", L1);
+    renderTable("tabL2", L2);
+
+    const { allL, V } = vBetweenL(L1, L2);
+    const { v1, v2, v3 } = countVTypes(V);
+
+    $("outOG").textContent = fmt(oG,1);
+    $("outOD").textContent = fmt(oD,1);
+    $("outD1").textContent = fmt(D1,1);
+    $("outN").textContent = String(N);
+    $("outE").textContent = fmt(e,1);
+    $("outL1Start").textContent = fmt(L1Start,1);
+
+    $("outNbL1").textContent = String(L1.length);
+    $("outNbL2").textContent = String(L2.length);
+    $("outNbV").textContent = String(V.length);
+    $("outV123").textContent = `${v1} / ${v2} / ${v3}`;
+
+    renderSVG(distExt, larAr, allL, V);
+
+    return {
+      distExt, pasNom, jG, jD, epEmbr, larAv, larAr, epAv, epAr,
+      oG, oD, D1, N, e, L1Start,
+      L1: L1.map(x=>Math.round(x)),
+      L2: L2.map(x=>Math.round(x)),
+      V: { total: V.length, v1, v2, v3 }
+    };
+  }
+
+  $("calcBtn").addEventListener("click", compute);
+  ["distExt","pasNom","jG","jD","epEmbr","larAv","larAr","epAv","epAr","roundUp"]
+    .forEach(id => $(id).addEventListener("input", compute));
+
+  $("copyBtn").addEventListener("click", async () => {
+    const data = compute();
+    const txt =
+`BARDAGE – RÉSULTATS
+Distance ext: ${data.distExt} mm
+Jonction gauche: ${data.jG} | droite: ${data.jD}
+Offset gauche: ${data.oG.toFixed(1)} mm | offset droite: ${data.oD.toFixed(1)} mm
+D1: ${data.D1.toFixed(1)} mm
+N: ${data.N}
+Entraxe e: ${data.e.toFixed(1)} mm
+L1 start: ${data.L1Start.toFixed(1)} mm
+Nb L1: ${data.L1.length} | Nb L2: ${data.L2.length}
+V total: ${data.V.total} (V1/V2/V3: ${data.V.v1}/${data.V.v2}/${data.V.v3})
+
+L1: ${data.L1.join(", ")}
+L2: ${data.L2.join(", ")}
+`;
+    try {
+      await navigator.clipboard.writeText(txt);
+      $("copyBtn").textContent = "Copié ✅";
+      setTimeout(()=> $("copyBtn").textContent = "Copier résultats", 900);
+    } catch (e) {
+      alert("Copie impossible (permissions).");
+    }
+  });
+
+  // calcul initial
+  compute();
+})();
+</script>
+
+</body>
+</html>

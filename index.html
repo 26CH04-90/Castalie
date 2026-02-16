@@ -140,30 +140,65 @@
     }
     tr:last-child td { border-bottom: none; }
 
-    .viz {
+    .junctions {
       margin-top: 10px;
       border: 1px solid var(--border);
       border-radius: 14px;
       background: rgba(0,0,0,0.16);
       padding: 10px;
     }
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 10px;
-      margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 12px;
+    .junctions-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
-    .chip { display: inline-flex; align-items: center; gap: 6px; }
-    .dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
-    .dot.l1 { background: var(--l1); }
-    .dot.l2 { background: var(--l2); }
-    .dot.v1 { background: var(--v1); }
-    .dot.v2 { background: var(--v2); }
-    .dot.v3 { background: var(--v3); }
-
-    svg { width: 100%; height: 120px; display: block; }
+    @media (min-width: 640px) {
+      .junctions-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .junction-card {
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .junction-title {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .junction-label {
+      margin: 4px 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .junction-image-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.22);
+      min-height: 84px;
+      display: grid;
+      place-items: center;
+      padding: 6px;
+    }
+    .junction-image-wrap img {
+      width: 100%;
+      height: auto;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+    }
+    .junction-fallback {
+      display: none;
+      font-size: 12px;
+      color: var(--warn);
+      line-height: 1.3;
+      text-align: center;
+      word-break: break-word;
+      padding: 6px;
+    }
     .footer {
       margin-top: 10px;
       font-size: 12px;
@@ -298,17 +333,27 @@
         </div>
       </div>
 
-      <div class="viz">
-        <div class="legend">
-          <span class="chip"><span class="dot l1"></span>L1</span>
-          <span class="chip"><span class="dot l2"></span>L2</span>
-          <span class="chip"><span class="dot v1"></span>V1</span>
-          <span class="chip"><span class="dot v2"></span>V2</span>
-          <span class="chip"><span class="dot v3"></span>V3</span>
+      <div class="junctions">
+        <div class="footer" style="margin-top:0; margin-bottom:8px;">
+          Jonctions
         </div>
-        <svg id="svg"></svg>
-        <div class="footer">
-          Visu = vue de dessus simplifiée (lambourdes aux extrémités, L posées selon L1/L2, V centrées entre 2 L).
+        <div class="junctions-grid">
+          <article class="junction-card">
+            <h3 class="junction-title">Gauche</h3>
+            <div id="junctionLeftLabel" class="junction-label">—</div>
+            <div class="junction-image-wrap">
+              <img id="junctionLeftImg" src="" alt="" />
+              <div id="junctionLeftFallback" class="junction-fallback"></div>
+            </div>
+          </article>
+          <article class="junction-card">
+            <h3 class="junction-title">Droite</h3>
+            <div id="junctionRightLabel" class="junction-label">—</div>
+            <div class="junction-image-wrap">
+              <img id="junctionRightImg" src="" alt="" />
+              <div id="junctionRightFallback" class="junction-fallback"></div>
+            </div>
+          </article>
         </div>
       </div>
 
@@ -519,93 +564,36 @@
     });
   }
 
-  function renderSVG(distExt, larAr, allL, V) {
-    const svg = $("svg");
-    const w = svg.clientWidth || 600;
-    const h = 120;
-    const pad = 14;
-    const usable = w - 2*pad;
+  const junctionMeta = {
+    1: { label: "Embrasure", slug: "embrasure" },
+    2: { label: "Angle sortant", slug: "angle_sortant" },
+    3: { label: "Angle rentrant", slug: "angle_rentrant" },
+    4: { label: "Menuiserie", slug: "menuiserie" },
+  };
 
-    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-    svg.innerHTML = "";
+  function setJunctionCard(side, selectValue) {
+    const sideKey = side === "left" ? "Left" : "Right";
+    const sidePrefix = side === "left" ? "gauche" : "droite";
+    const sideLabel = side === "left" ? "gauche" : "droite";
+    const meta = junctionMeta[selectValue] || junctionMeta[1];
 
-    // fond
-    const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
-    bg.setAttribute("x", 0); bg.setAttribute("y", 0);
-    bg.setAttribute("width", w); bg.setAttribute("height", h);
-    bg.setAttribute("rx", 12);
-    bg.setAttribute("fill", "rgba(0,0,0,0.0)");
-    svg.appendChild(bg);
+    const image = $(`junction${sideKey}Img`);
+    const label = $(`junction${sideKey}Label`);
+    const fallback = $(`junction${sideKey}Fallback`);
+    const expectedSrc = `./assets/jonctions/${sidePrefix}_${meta.slug}.png`;
 
-    function xpx(mm) {
-      if (distExt <= 0) return pad;
-      return pad + (mm/distExt) * usable;
-    }
+    label.textContent = meta.label;
+    image.alt = `Jonction ${sideLabel} – ${meta.label}`;
+    image.dataset.expectedSrc = expectedSrc;
+    image.hidden = false;
+    fallback.style.display = "none";
+    fallback.textContent = "";
+    image.src = expectedSrc;
+  }
 
-    // lambourdes (extrémités)
-    const leftPost = document.createElementNS("http://www.w3.org/2000/svg","rect");
-    leftPost.setAttribute("x", pad-4); leftPost.setAttribute("y", 18);
-    leftPost.setAttribute("width", 6); leftPost.setAttribute("height", 84);
-    leftPost.setAttribute("fill", "rgba(255,255,255,0.22)");
-    svg.appendChild(leftPost);
-
-    const rightPost = document.createElementNS("http://www.w3.org/2000/svg","rect");
-    rightPost.setAttribute("x", pad+usable-2); rightPost.setAttribute("y", 18);
-    rightPost.setAttribute("width", 6); rightPost.setAttribute("height", 84);
-    rightPost.setAttribute("fill", "rgba(255,255,255,0.22)");
-    svg.appendChild(rightPost);
-
-    // rail
-    const rail = document.createElementNS("http://www.w3.org/2000/svg","rect");
-    rail.setAttribute("x", pad); rail.setAttribute("y", 56);
-    rail.setAttribute("width", usable); rail.setAttribute("height", 8);
-    rail.setAttribute("fill", "rgba(255,255,255,0.08)");
-    rail.setAttribute("rx", 4);
-    svg.appendChild(rail);
-
-    // L lames (dessin simplifié: petits rectangles)
-    for (const l of allL) {
-      const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
-      r.setAttribute("x", xpx(l.x) - 9);
-      r.setAttribute("y", 36);
-      r.setAttribute("width", 18);
-      r.setAttribute("height", 44);
-      r.setAttribute("rx", 4);
-      r.setAttribute("fill", l.t==="L1" ? getComputedStyle(document.documentElement).getPropertyValue("--l1") : getComputedStyle(document.documentElement).getPropertyValue("--l2"));
-      r.setAttribute("opacity", "0.95");
-      svg.appendChild(r);
-    }
-
-    // V lames centrées entre L
-    for (const v of V) {
-      const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
-      r.setAttribute("x", xpx(v.x) - 6);
-      r.setAttribute("y", 22);
-      r.setAttribute("width", 12);
-      r.setAttribute("height", 76);
-      r.setAttribute("rx", 3);
-
-      const cssVar = (v.t==="V1") ? "--v1" : (v.t==="V2") ? "--v2" : "--v3";
-      r.setAttribute("fill", getComputedStyle(document.documentElement).getPropertyValue(cssVar));
-      r.setAttribute("opacity", "0.85");
-      svg.appendChild(r);
-    }
-
-    // cote
-    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
-    line.setAttribute("x1", pad); line.setAttribute("x2", pad+usable);
-    line.setAttribute("y1", 105); line.setAttribute("y2", 105);
-    line.setAttribute("stroke", "rgba(255,255,255,0.20)");
-    line.setAttribute("stroke-width", "2");
-    svg.appendChild(line);
-
-    const txt = document.createElementNS("http://www.w3.org/2000/svg","text");
-    txt.setAttribute("x", pad);
-    txt.setAttribute("y", 114);
-    txt.setAttribute("fill", "rgba(255,255,255,0.65)");
-    txt.setAttribute("font-size", "12");
-    txt.textContent = `Distance ext.: ${Math.round(distExt)} mm`;
-    svg.appendChild(txt);
+  function updateJunctionImages() {
+    setJunctionCard("left", parseInt($("jG").value, 10));
+    setJunctionCard("right", parseInt($("jD").value, 10));
   }
 
   function compute() {
@@ -637,7 +625,7 @@
     renderTable("tabL1", L1);
     renderTable("tabL2", L2);
 
-    const { allL, V } = vBetweenL(L1, L2);
+    const { V } = vBetweenL(L1, L2);
     const { v1, v2, v3 } = countVTypes(V);
 
     $("outOG").textContent = fmt(oG,1);
@@ -652,7 +640,7 @@
     $("outNbV").textContent = String(V.length);
     $("outV123").textContent = `${v1} / ${v2} / ${v3}`;
 
-    renderSVG(distExt, larAr, allL, V);
+    updateJunctionImages();
 
     return {
       distExt, pasNom, jG, jD, epEmbr, larAv, larAr, epAv, epAr,
@@ -669,6 +657,22 @@
   });
   ["distExt","pasNom","jG","jD","epEmbr","larAv","larAr","epAv","epAr","roundUp"]
     .forEach(id => $(id).addEventListener("input", compute));
+
+  ["jG", "jD"].forEach((id) => {
+    $(id).addEventListener("change", updateJunctionImages);
+  });
+
+  ["junctionLeftImg", "junctionRightImg"].forEach((id) => {
+    $(id).addEventListener("error", (event) => {
+      const image = event.currentTarget;
+      const side = id.includes("Left") ? "Left" : "Right";
+      const fallback = $(`junction${side}Fallback`);
+      const expectedSrc = image.dataset.expectedSrc || image.getAttribute("src") || "";
+      image.hidden = true;
+      fallback.style.display = "block";
+      fallback.textContent = `Image jonction manquante (${expectedSrc})`;
+    });
+  });
 
   $("copyBtn").addEventListener("click", async () => {
     const data = compute();
@@ -694,6 +698,7 @@ L2: ${data.L2.join(", ")}
 
   // calcul initial
   compute();
+  updateJunctionImages();
 })();
 </script>
 

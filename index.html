@@ -224,6 +224,26 @@
     .settings-wrap {
       margin-top: 12px;
     }
+    .plan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .plan-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .plan-btn:hover {
+      background: rgba(255,255,255,0.12);
+    }
     .settings-toggle {
       width: 100%;
       background: rgba(255,255,255,0.08);
@@ -360,6 +380,11 @@
     </section>
   </div>
 
+  <section class="card" aria-labelledby="plans-title">
+    <h2 id="plans-title" class="settings-title" style="margin-bottom:0;">Plans chantier</h2>
+    <div id="planList" class="plan-list"></div>
+  </section>
+
   <section class="settings-wrap">
     <button id="settingsBtn" class="settings-toggle secondary" type="button">Réglage de base</button>
 
@@ -431,6 +456,44 @@
 <script>
 (function() {
   const $ = (id) => document.getElementById(id);
+  const planFiles = [
+    "D10-A-Peinture et principe.pdf",
+    "D20-A-Lamage de façade.pdf",
+    "D21-A-lamage sur toit terrasse.pdf",
+    "D30-A-embrasure et coupure ventil.pdf",
+    "D31-A-Angle rentrant.pdf",
+    "D32-A-Embrasure secours.pdf",
+    "D40-A-Garde-corps embrasure.pdf",
+    "D41-A-Barriere.pdf",
+    "D50-A-RF1 angle sortant.pdf",
+    "D51-A-RF1 angle rentrant.pdf",
+    "D52-A-RF1 embrasure.pdf",
+    "D60-A-couverture.pdf",
+    "Plan Lamage 30A.pdf",
+    "Plan Lamage 30B.pdf",
+    "Plan Lamage 31A.pdf",
+    "Plan Lamage 31B.pdf",
+    "Plan Lamage 32A.pdf",
+    "Plan Lamage 32B.pdf",
+    "Plan Lamage 33A.pdf"
+  ];
+
+  function renderPlans() {
+    const list = $("planList");
+    if (!list) return;
+
+    list.innerHTML = "";
+    planFiles.forEach((fileName) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "plan-btn";
+      button.textContent = `📄 ${fileName.replace(/\.pdf$/i, "")}`;
+      button.addEventListener("click", () => {
+        window.open(`./assets/plans/${encodeURIComponent(fileName)}`, "_blank");
+      });
+      list.appendChild(button);
+    });
+  }
 
   function num(id) {
     const v = parseFloat($(id).value);
@@ -696,6 +759,7 @@ L2: ${data.L2.join(", ")}
   });
 
   // calcul initial
+  renderPlans();
   compute();
   updateJunctionImages();
 })();
